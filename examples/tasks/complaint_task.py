@@ -7,14 +7,14 @@ class ComplaintTask(Task):
     def trigger_intent() -> str:
         return 'complaint'
 
-    async def on_output_scope_intent(self):
+    async def on_out_scope_intent(self):
         await self.bot.say('当前正在为您处理投诉的任务，请问您确定要结束此任务吗？')
         message: Message = await self.wait_for_user()
         if message.intent.intent == 'affirm':
             await self.end_task()
             
         elif not message.intent.intent == 'deny':
-            await self.on_output_scope_intent()
+            await self.on_out_scope_intent()
         
     async def conversation(self):
         # 处理核心对话逻辑

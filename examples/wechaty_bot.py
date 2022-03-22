@@ -1,15 +1,13 @@
 """doc"""
 import asyncio
-import imp
 import logging
 import os
 from re import L
-from typing import Optional, Union
+from typing import Optional
 
-from wechaty_puppet import FileBox
 
-from wechaty import Wechaty, Contact
-from wechaty.user import Message, Room
+from wechaty import Wechaty 
+from wechaty.user import Message
 
 logging.basicConfig(
     level=logging.INFO,

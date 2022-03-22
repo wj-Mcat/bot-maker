@@ -1,6 +1,7 @@
-Flask
 requests
 dataclasses-json
-rasa
 jieba
 apscheduler
+pyee
+requests
+wechaty

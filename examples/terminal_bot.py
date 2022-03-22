@@ -1,9 +1,11 @@
+
 import asyncio
-import sys
-sys.path.insert(0, '/Users/mcat/Code/myself-opensource/bot-maker')
-from bot_maker.schema import Bot, Message, User
+from typing import Tuple, List
+
+from bot_maker.schema import Bot, Message, User, Intent, Slot
 from bot_maker.maker import Task
-from bot_maker.nlu import NLUServer, RasaNLUServer
+from bot_maker.nlu import NLUServer
+from bot_maker.nlu.rasa_nlu import RasaNLUServer
 
 
 class TerminalBot(Bot):
@@ -18,7 +20,8 @@ class TerminalUser(User):
 
 
 class FakeNLUServer(NLUServer):
-    pass
+    async def parse(self, message: str) -> Tuple[Intent, List[Slot]]:
+        pass
 
 
 class TerminalConversation(Task):
@@ -26,7 +29,7 @@ class TerminalConversation(Task):
     def trigger_intent(self) -> str:
         return 'weather'
 
-    def on_output_scope_intent(self):
+    def on_out_scope_intent(self):
         pass
 
     async def conversation(self, message: Message = None):
@@ -56,11 +59,11 @@ class HelloConversation(Task):
     def conversation(self):
         return "您好，我是吴京京的助手机器人，很愿意帮你们处理任何你们想处理的任何事情"
 
+
 async def main():
-    nlu_server = RasaNLUServer('http://dev.chatie.io:5005/')
+    nlu_server = RasaNLUServer('endpoint-of-rasa server')
 
     bot, user = TerminalBot(), TerminalUser()
-
     conversation = TerminalConversation(nlu=nlu_server, bot=bot, user=user)
     await conversation.conversation()
 
