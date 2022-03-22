@@ -1,0 +1,6 @@
+Flask
+requests
+dataclasses-json
+rasa
+jieba
+apscheduler
