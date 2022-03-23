@@ -1,7 +1,5 @@
 from __future__ import annotations
-from cgitb import text
-from datetime import datetime
-from typing import List, Optional, Tuple, Union
+from typing import List, Tuple, Union
 from abc import ABC, abstractmethod
 from bot_maker.schema import Intent, Message, Slot
 
@@ -23,6 +21,7 @@ class IntentServer(ABC):
     @abstractmethod
     async def parse(self, message: str) -> Intent:
         raise NotImplementedError
+
 
 class SlotFillingServer(ABC):
     """Slot filling server which handle the slot filling process

@@ -1,6 +1,7 @@
 from bot_maker.maker import Task
 from bot_maker.schema import Message
 
+
 class ComplaintTask(Task):
 
     @staticmethod
@@ -23,8 +24,6 @@ class ComplaintTask(Task):
             message: Message = await self.wait_for_user()
             if message.intent.intent == 'deny':
                 break
-            # db.session.add(message)
-            # db.session.commit()
 
         await self.bot.say('非常感谢您的投诉举报，我们会有专门的工作人员跟进您投诉的内容')
     

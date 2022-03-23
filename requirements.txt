@@ -5,3 +5,4 @@ apscheduler
 pyee
 requests
 wechaty
+paddle-prompt

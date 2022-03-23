@@ -48,6 +48,9 @@ class Entity:
     confidence: float
     type: EntityType
 
+    start_offset: int = 0
+    end_offset: int = 0
+
 
 @dataclass_json
 @dataclass
@@ -59,6 +62,7 @@ class Slot:
 @dataclass_json
 @dataclass
 class SlotField:
+    """Form task which should be collected within form mode"""
     name: str
     exception_msg: str
     required: bool = True
@@ -110,6 +114,14 @@ class Message:
         )
 
 
+@dataclass_json
+@dataclass
+class Corpus:
+    text: str
+    intent: Intent
+    entities: List[Entity]
+
+
 class DialogueState:
     def __init__(self):
         self.slots: Dict[str, Slot] = {}
@@ -152,6 +164,7 @@ class User:
         self._messages.append(message)
         self.event.set()
 
+
 class Bot:
     async def say(self, msg: str):
         raise NotImplementedError
@@ -184,6 +197,7 @@ def parse_intent(json_data: dict) -> Intent:
         confidence=1,
     )
     return intent
+
 
 def parse_slots(json_data: dict) -> List[Slot]:
     slots = []

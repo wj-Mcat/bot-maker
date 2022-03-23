@@ -15,6 +15,9 @@ from bot_maker.schema import DialogueState, Bot, User, SlotField, Message, Wecha
 
 
 class Task:
+    """
+    TODO: support few shot data set at here which can use the paddle/torch to handle intent& slot filling task
+    """
     def __init__(self, nlu: NLU, user: Optional[User] = None, bot: Optional[Bot] = None):
         self.bot = bot or Bot()
         self.user = user or User()
@@ -36,7 +39,7 @@ class Task:
         # TODO: deep test form data collector
         turns: int = 0
         for slot_field in slot_fields:
-            self.bot.say(slot_field.exception_msg)
+            await self.bot.say(slot_field.exception_msg)
             turns += 1
 
             if not self.state.get(slot_field.name):
@@ -144,12 +147,25 @@ class Maker:
         self.qa_conversation = qa_conversation
         self.chitchat_conversation = chitchat_conversation
 
-    def add_task(self, task: Type[Task]):
-        if not issubclass(task, Task):
-            raise TypeError(f'the type of task<{task}> is not correct.')
-        if task.name() in self._tasks:
-            raise ValueError(f'Task<{task.name()}> have been added into Maker.')
-        self._tasks[task.name()] = task
+    def add_task(self, task: Type[Task], *args) -> None:
+        """
+        add task to the maker
+
+        Args:
+            task: subclass of Task, which should not be the instance
+            *args: the other task
+        """
+        tasks = [task]
+        if args:
+            tasks.extend(args)
+        for task in tasks:
+            if not issubclass(task, Task):
+                raise TypeError(f'the type of task<{task}> is not correct.')
+
+            task_name = task.name()
+            if task_name in self._tasks:
+                raise ValueError(f'Task<{task_name}> have been added into Maker.')
+            self._tasks[task_name] = task
 
     async def match_task(self, msg: str) -> Optional[Type[Task]]:
         message: Message = await self.nlu.parse(msg)

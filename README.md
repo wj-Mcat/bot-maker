@@ -12,11 +12,6 @@ Tools for Building Bot with small scripts which can fully control the conversati
 * default support python-wechaty, which can help you get in touch with wechat, dingtalk, whatsapp, and so on ...
 * ...
 
-## Installation
-
-```shell
-pip install bot-maker
-```
 
 ## Task Script 
 
@@ -52,6 +47,22 @@ class SalesTask(Task):
 ## BluePrint
 
 ![](./assets/csml.png)
+
+## Quick Start
+
+### Installation
+
+```shell
+pip install bot-maker
+```
+
+### Write Task Script
+
+```python
+
+```
+
+
 
 ## Creators
 
