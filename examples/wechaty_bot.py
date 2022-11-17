@@ -1,20 +1,22 @@
 """doc"""
 import asyncio
 import os
+os.environ['token'] = 'wujingjing-ubuntu-server-padlocal-token'
 from typing import Optional
 
 from wechaty import Wechaty
 from wechaty.user import Message
 
-from examples.tasks.complaint_task import ComplaintTask
-from examples.tasks.greet_task import GreetTask
-from examples.tasks.return_visit_task import ReturnVisitTask
-from examples.tasks.weather_task import WeatherTask
-
 from bot_maker.maker import Maker
+from bot_maker.maker import Task
 from bot_maker.nlu.rasa_nlu import RasaNLUServer
 from bot_maker.nlu.remote_slot import RemoteSlotFillingServer
 from bot_maker.nlu.base_nlu import NLU
+
+
+class SimpleChitchatTask(Task):
+    def __init__(self, nlu: NLU, user: Optional[User] = None, bot: Optional[Bot] = None):
+        super().__init__(nlu, user, bot)
 
 
 # 1. define the rasa & slot server
@@ -31,8 +33,6 @@ nlu = NLU()
 nlu.use([rasa_server, slot_server])
 
 maker = Maker(nlu=nlu)
-maker.add_task(ReturnVisitTask, ComplaintTask, GreetTask, WeatherTask)
-
 
 # 3. run with wechaty
 async def message(msg: Message) -> None:

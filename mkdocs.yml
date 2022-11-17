@@ -1,0 +1,39 @@
+site_name: Bot Maker
+repo_url: http://github.com/wj-Mcat/bot-maker
+repo_name: BotMaker
+site_description: 'Tools for Building Bot with small scripts which can fully control the conversation logit.'
+copyright: '@wj-Mcat'
+nav:
+  - 介绍: 'index.md'
+
+theme:
+  name: material
+  logo: img/wechaty-icon-white.svg
+  favicon: img/favicon.ico
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - toc:
+      baselevel: 2
+
+google_analytics:
+  - G-1TDFTF2BYD
+  - auto
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          selection:
+            filters:
+              - "!^_"  # exlude all members starting with _
+              - "^__init__$"  # but always include __init__ modules and methods
+          rendering:
+            show_root_heading: yes
+            show_root_full_path: false
+            members_order: source
+            heading_level: 2
+      watch:
+        - ./src

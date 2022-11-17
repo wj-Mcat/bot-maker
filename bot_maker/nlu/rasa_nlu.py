@@ -4,10 +4,11 @@ from unicodedata import name
 import requests
 
 from bot_maker.schema import Entity, EntityType, Intent, Message, Slot, parse_intent, parse_slots
-from bot_maker.nlu.base_nlu import NLUServer
+from bot_maker.nlu.base_nlu import NLUModel
 
 
-class RasaNLUServer(NLUServer):
+class RasaNLUModel(NLUModel):
+
     def __init__(self, endpoint: str):
         if not endpoint.endswith('/'):
             endpoint += '/'

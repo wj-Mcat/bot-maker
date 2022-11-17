@@ -9,7 +9,6 @@ from typing import Any, Type, List, Optional, Dict, Union
 from wechaty import Contact, Room
 from wechaty_puppet import FileBox
 
-from bot_maker.nlu import NLUServer
 from bot_maker.nlu.base_nlu import NLU
 from bot_maker.schema import DialogueState, Bot, User, SlotField, Message, WechatyBot
 
@@ -19,11 +18,11 @@ class Task:
     TODO: support few shot data set at here which can use the paddle/torch to handle intent& slot filling task
     """
     def __init__(self, nlu: NLU, user: Optional[User] = None, bot: Optional[Bot] = None):
-        self.bot = bot or Bot()
-        self.user = user or User()
+        self.bot: Bot = bot or Bot()
+        self.user: User = user or User()
 
         self.nlu: NLU = nlu
-        self.state = DialogueState()
+        self.state: DialogueState = DialogueState()
 
     @classmethod
     def name(cls) -> str:

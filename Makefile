@@ -1,10 +1,10 @@
 
-SOURCE_GLOB=$(wildcard src/bot_maker/*.py src/bot_maker/**/*.py tests/**/*.py examples/*.py)
+SOURCE_GLOB=$(wildcard bot_maker/*.py bot_maker/**/*.py tests/**/*.py examples/*.py)
 
 IGNORE_PEP=E203,E221,E241,E272,E501,F811
 
 # help scripts to find the right place of bot_maker module
-export PYTHONPATH=src/
+export PYTHONPATH=./
 
 .PHONY: all
 all : clean lint
@@ -81,7 +81,7 @@ install:
 
 .PHONY: pytest
 pytest:
-	pytest src/ tests/
+	pytest tests/
 
 .PHONY: test-unit
 test-unit: pytest

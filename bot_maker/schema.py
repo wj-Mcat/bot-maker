@@ -1,12 +1,28 @@
+"""
+Bot Maker - https://github.com/wj-Mcat/bot-maker
+
+Authors:   Jingjing WU (吴京京) <https://github.com/wj-Mcat>
+
+2022-now @ Copyright wj-Mcat
+
+Licensed under the Apache License, Version 2.0 (the 'License');
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an 'AS IS' BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+"""
 from __future__ import annotations
 from asyncio import Event
-from optparse import Option
 from typing import List, Union, Optional, Dict
 from enum import Enum
 from datetime import datetime
-import requests
 from dataclasses import dataclass
-from dataclasses_json import dataclass_json
 
 from wechaty import Contact, Room
 
@@ -16,6 +32,9 @@ UNKNOWN_INTENT = 'unknown_intent'
 class SystemEntity(Enum):
     date = 'sys_date'
     location = 'sys_location'
+    int = "sys_int"
+    float = "sys_float"
+    datetime = "sys_datetime"
 
 
 class EntityType(Enum):
@@ -26,7 +45,6 @@ class EntityType(Enum):
     location = 4
 
 
-@dataclass_json
 @dataclass
 class Intent:
     intent: str
@@ -37,10 +55,9 @@ class Intent:
         return Intent(intent=UNKNOWN_INTENT)
     
     def is_unknown(self) -> bool:
-        return self.intent == UNKNOWN_INTENT
+        return self.intent == UNKNOWN_INTENT 
 
 
-@dataclass_json
 @dataclass
 class Entity:
     value: str
@@ -52,14 +69,12 @@ class Entity:
     end_offset: int = 0
 
 
-@dataclass_json
 @dataclass
 class Slot:
     name: str
     entity: Entity
 
 
-@dataclass_json
 @dataclass
 class SlotField:
     """Form task which should be collected within form mode"""
@@ -69,7 +84,6 @@ class SlotField:
     max_turns: int = 3
 
 
-@dataclass_json
 @dataclass
 class Message:
     intent: Intent                      # 一个文本中只允许有一个意图
@@ -114,7 +128,6 @@ class Message:
         )
 
 
-@dataclass_json
 @dataclass
 class Corpus:
     text: str

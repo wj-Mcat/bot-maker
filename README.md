@@ -12,6 +12,35 @@ Tools for Building Bot with small scripts which can fully control the conversati
 * default support python-wechaty, which can help you get in touch with wechat, dingtalk, whatsapp, and so on ...
 * ...
 
+## Quick Start
+
+### Installtion
+
+```shell
+pip install bot-maker
+```
+
+### Start bot
+
+```python
+from asyncio
+from bot_maker import Bot, FAQ, DocumentQA, DocVQA, TaskOriented
+
+async def run():
+    bot = Bot()
+    bot.use([
+        FAQ(corpus='./faq.json'),
+        DocumentQA(corpus='http://docs.readthedocs.io'),
+        TaskOriented(
+            scripts=[
+                BookTrainTicket()
+            ]
+        )
+    ])
+    await bot.start()
+
+asyncio.run(run())
+```
 
 ## Task Script 
 

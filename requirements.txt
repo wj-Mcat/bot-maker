@@ -6,3 +6,6 @@ pyee
 requests
 wechaty
 paddle-prompt
+Quart
+nltk
+typer

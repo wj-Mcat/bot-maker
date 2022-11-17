@@ -18,4 +18,3 @@ class ClockTask(Task):
                 break
 
         await self.bot.say('非常感谢您的投诉举报，我们会有专门的工作人员跟进您投诉的内容')
-    
