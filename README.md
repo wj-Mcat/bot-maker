@@ -61,7 +61,7 @@ class SalesTask(Task):
     async def conversation(self):
         username = self.state.get('username')
         if username:
-            await self.bot.say(f"Hi {username}! It's a pleasure to see you.")
+            await self.bot.say(f"Hi {username}! It's a pleasure to see you.", say_once=True)
         self.bot.say('How can I help you today?')
         
         message = await self.user.wait_message()
