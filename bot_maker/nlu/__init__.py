@@ -1,10 +1,9 @@
-import imp
-from .base_nlu import NLUServer, NLU, Intent, SlotFillingServer
+# from .base_nlu import NLU, Intent
 
-__all__ = [
-    "NLU",
-    "NLUServer",
+# __all__ = [
+#     "NLU",
+#     "NLUServer",
 
-    "Intent",
-    "SlotFillingServer"
-]
+#     "Intent",
+#     "SlotFillingServer"
+# ]

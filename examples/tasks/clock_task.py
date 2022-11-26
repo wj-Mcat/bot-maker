@@ -1,6 +1,6 @@
 from __future__ import annotations
 from bot_maker.maker import Task
-from bot_maker.schema import Message
+from bot_maker.schema import DialogueState
 
 
 class ClockTask(Task):

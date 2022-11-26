@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from wechaty_puppet import get_logger
 
 
-from bot_maker.schema import Intent, Slot
+from bot_maker.schema import Intent, Slot, Entity, DialogueState
 
 
 logger = get_logger("BaseNLU")
@@ -22,7 +22,7 @@ class NLUModel(ABC):
     def from_pretrained(cls, cache_dir: str) -> NLUModel:
         raise NotImplementedError
 
-class IntentModel(NLUModel, ABC):
+class IntentClassificationModel(NLUModel, ABC):
     """Intent Server which handle the intent parsing
 
     Input:
@@ -36,9 +36,30 @@ class IntentModel(NLUModel, ABC):
             }
         }
     """
-    @abstractmethod
+
     async def parse_intent(self, message: str) -> Optional[Intent]:
+        intents = await self.parse_intents(message)
+        return intents[0] if intents else None
+
+    @abstractmethod
+    async def parse_intents(self, message: str) -> List[Intent]:
         raise NotImplementedError
+
+
+class KeywordIntentClassificationModel(IntentClassificationModel):
+    def __init__(self, corpus: Dict[str, List[str]], *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.intent2keywords = corpus
+    
+    async def parse_intents(self, message: str) -> List[Intent]:
+        intents = {}
+        for intent, keywords in self.intent2keywords.items():
+            if any([True for keyword in keywords if keyword in message]):
+                intents[intent] = Intent(
+                    intent=intent,
+                    confidence=1
+                )
+        return list(intents.values())
 
 
 class SlotFillingModel(NLUModel, ABC):
@@ -61,44 +82,58 @@ class SlotFillingModel(NLUModel, ABC):
     """
 
     @abstractmethod
-    async def parse_slot_filling(self, message: str) -> List[Slot]:
+    async def parse_slots(self, message: str) -> List[Slot]:
         raise NotImplementedError
 
+
+class KeywordSlotFillingModel(SlotFillingModel):
+    def __init__(self, corpus: Dict[str, List[str]], *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        
+        self.slot2keywords = corpus
+    
+    async def parse_slots(self, message: str) -> List[Slot]:
+        slots = []
+        for slot_name, keywords in self.slot2keywords.items():
+            for keyword in keywords:
+                if keyword in message:
+                    slots.append(
+                        Slot(
+                            name=slot_name,
+                            entity=Entity.from_sentence(keyword, slot_name, message)
+                        )
+                    )
+        return slots
+    
 
 class NLUModel(ABC):
     INTENT_DIR: str = "nlu"
     SLOT_FILLING_DIR: str = 'slot_filling'
     
-    def __init__(self, intent_model: Optional[IntentModel] = None, slot_filling_model: Optional[SlotFillingModel] = None) -> None:
+    def __init__(self, intent_model: Optional[IntentClassificationModel] = None, slot_filling_model: Optional[SlotFillingModel] = None) -> None:
         self.intent_model = intent_model
         self.slot_filling_model = slot_filling_model
     
     async def parse(self, message: str) -> Tuple[Optional[Intent], List[Slot]]:
-        intent = None 
+        intents = []
         if self.intent_model is not None:
-            intent = await self.intent_model.parse_intent(message)
+            intents = await self.intent_model.parse_intents(message)
         
         slots = []
         if self.slot_filling_model is not None:
-            slots = await self.slot_filling_model.parse_slot_filling(message)
+            slots = await self.slot_filling_model.parse_slots(message)
         
-        return intent, slots
+        return intents, slots
     
-    @staticmethod
-    def from_pretrained(pretrained_path: str):
-        intent_pretrained_dir = os.path.join(pretrained_path, NLUModel.INTENT_DIR)
-        
-        intent_model = None
-        if os.path.exists(intent_pretrained_dir):
-            logger.info("start to load intent modle from: %s", intent_pretrained_dir)
-            intent_model = IntentModel
-            
-
-    def save_pretrained(self, pretrained_path: str):
-        if self.intent_model is not None:
-            self.intent_model.save_pretrained(pretrained_path)
-        if self.slot_filling_model is not None:
-            self.slot_filling_model.save_pretrained(pretrained_path)
+    async def parse_dialogue_state(self, message: str) -> DialogueState:
+        intents, slots = await self.parse(message)
+        intent = intents[0] if intents else None
+        return DialogueState(
+            intent=intent,
+            intents=intents,
+            slots=slots,
+            text=message
+        )
 
     
 class RemoteNLUModel:

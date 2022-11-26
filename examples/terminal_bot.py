@@ -2,7 +2,7 @@
 import asyncio
 from typing import Tuple, List
 
-from bot_maker.schema import Bot, Message, User, Intent, Slot
+from bot_maker.schema import Bot, DialogueState, User, Intent, Slot
 from bot_maker.maker import Task
 from bot_maker.nlu import NLUServer
 from bot_maker.nlu.rasa_nlu import RasaNLUServer
@@ -32,7 +32,7 @@ class TerminalConversation(Task):
     def on_out_scope_intent(self):
         pass
 
-    async def conversation(self, message: Message = None):
+    async def conversation(self, message: DialogueState = None):
         all_slots = {}
         if not message:
             message = await self.wait_for_user()

@@ -1,14 +1,14 @@
 from abc import abstractmethod
 from typing import List, Dict, Optional
 from copy import deepcopy
-from bot_maker.schema import Message, EntityType, SystemEntity
+from bot_maker.schema import DialogueState, EntityType, SystemEntity
 from jieba.posseg import pair
 
 
 class BaseExtractor:
 
     @abstractmethod
-    async def extract(self, message: str) -> Message:
+    async def extract(self, message: str) -> DialogueState:
         raise NotImplementedError
 
 
@@ -58,11 +58,11 @@ class JieBaExtractor(BaseExtractor):
         location_tokens = [item.word for item in pairs if item.flag in ['ns', 'LOC']]
         return location_tokens
 
-    async def extract(self, text: str) -> Optional[Message]:
+    async def extract(self, text: str) -> Optional[DialogueState]:
         if not text:
             return None
         pairs = self._parse(text)
-        message = Message.default(text)
+        message = DialogueState.default(text)
 
         # 1. extract time slots & location slots, and add the first one into history state
         time_tokens = self._extract_time_tokens(pairs)
@@ -76,5 +76,5 @@ class LTPExtractor(BaseExtractor):
     """
     TODO: add pyltp tools to extract information from text
     """
-    async def extract(self, message: str) -> Message:
+    async def extract(self, message: str) -> DialogueState:
         pass

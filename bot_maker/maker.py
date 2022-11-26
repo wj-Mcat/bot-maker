@@ -6,22 +6,22 @@ from abc import abstractmethod
 from datetime import datetime
 from typing import Any, Type, List, Optional, Dict, Union
 
-from wechaty import Contact, Room
+from wechaty import Contact, Room, Message
 from wechaty_puppet import FileBox
 
-from bot_maker.nlu.base_nlu import NLU
-from bot_maker.schema import DialogueState, Bot, User, SlotField, Message, WechatyBot
+from bot_maker.nlu.base_nlu import NLUModel
+from bot_maker.schema import DialogueState, Bot, User, SlotField, DialogueState, WechatyBot
 
 
 class Task:
     """
     TODO: support few shot data set at here which can use the paddle/torch to handle intent& slot filling task
     """
-    def __init__(self, nlu: NLU, user: Optional[User] = None, bot: Optional[Bot] = None):
+    def __init__(self, nlu: NLUModel, user: Optional[User] = None, bot: Optional[Bot] = None):
         self.bot: Bot = bot or Bot()
         self.user: User = user or User()
 
-        self.nlu: NLU = nlu
+        self.nlu: NLUModel = nlu
         self.state: DialogueState = DialogueState()
 
     @classmethod
@@ -30,7 +30,6 @@ class Task:
 
     async def wait_for_user(self):
         message = await self.user.wait_message()
-        # message: Message = await self.nlu.parse(text)
         self.state.update(message)
         return message
 
@@ -61,7 +60,7 @@ class Task:
         raise NotImplementedError
 
     async def activate(self, msg: str):
-        message = await self.nlu.parse(msg)
+        message = await self.nlu.parse_dialogue_state(msg)
         await self.user.receive_message(message=message)
 
 
@@ -135,12 +134,16 @@ class FileBoxBotMessage(BotMessage):
 class Maker:
     def __init__(
             self,
-            nlu: NLU,
+            nlu: NLUModel,
+            bot: Optional[Type[Bot]] = None,
+            user: Optional[Type[User]] = None,
             qa_conversation: Optional[SingleTurnConversation] = None,
             chitchat_conversation: Optional[SingleTurnConversation] = None,
     ) -> None:
         self._tasks: Dict[str, Type[Task]] = {}
         self.nlu = nlu
+        self.bot = bot
+        self.user = user
         self.conversations: Dict[str, Conversation] = {}
 
         self.qa_conversation = qa_conversation
@@ -167,7 +170,10 @@ class Maker:
             self._tasks[task_name] = task
 
     async def match_task(self, msg: str) -> Optional[Type[Task]]:
-        message: Message = await self.nlu.parse(msg)
+        message: DialogueState = await self.nlu.parse_dialogue_state(msg)
+
+        if not message.intent:
+            return None
 
         # 1. match the task with trigger intent
         matched_task = None
@@ -181,6 +187,9 @@ class Maker:
         if conversation_id in self.conversations:
             self.conversations.pop(conversation_id)
 
+    async def on_nointent(self, msg: str, user: User):
+        pass
+
     async def feed_message(self, msg: str, target_user: Union[Contact, Room]) -> Optional[str]:
         # 1. 如果已存在与用户之间的对话脚本
         conversation_id = None
@@ -189,7 +198,7 @@ class Maker:
         elif isinstance(target_user, Room):
             conversation_id = target_user.room_id
         else:
-            raise ValueError(f'the type of target_user is not correct.')
+            conversation_id = target_user
 
         if conversation_id and conversation_id in self.conversations:
             await self.conversations[conversation_id].say(message=msg)

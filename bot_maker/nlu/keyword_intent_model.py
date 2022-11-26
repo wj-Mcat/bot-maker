@@ -6,7 +6,7 @@ from collections import defaultdict
 from wechaty_puppet import get_logger
 
 from bot_maker.schema import Intent
-from bot_maker.nlu.base_nlu import IntentModel
+from bot_maker.nlu.base_nlu import IntentClassificationModel
 
 
 logger = get_logger("KeywordIntentModel")
@@ -18,7 +18,7 @@ class KeywordIntentInputExample:
     keywords: List[str] = field(default_factory=list)
 
 
-class KeywordIntentModel(IntentModel):
+class KeywordIntentModel(IntentClassificationModel):
 
     def __init__(self, input_examples: List[KeywordIntentInputExample]) -> None:
         self.intent_keywords = defaultdict(set)

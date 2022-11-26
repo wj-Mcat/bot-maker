@@ -3,7 +3,7 @@ from typing import List, Optional, Tuple
 from unicodedata import name
 import requests
 
-from bot_maker.schema import Entity, EntityType, Intent, Message, Slot, parse_intent, parse_slots
+from bot_maker.schema import Entity, EntityType, Intent, DialogueState, Slot, parse_intent, parse_slots
 from bot_maker.nlu.base_nlu import NLUModel
 
 

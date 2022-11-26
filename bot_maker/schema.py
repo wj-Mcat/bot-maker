@@ -24,7 +24,7 @@ from enum import Enum
 from datetime import datetime
 from dataclasses import dataclass
 
-from wechaty import Contact, Room
+from wechaty import Contact, Room, Message
 
 UNKNOWN_INTENT = 'unknown_intent'
 
@@ -68,6 +68,18 @@ class Entity:
     start_offset: int = 0
     end_offset: int = 0
 
+    @staticmethod
+    def from_sentence(value: str, entity: str, sentence: str, confidence: float = 1.0, type: EntityType = EntityType.text):
+        index = sentence.index(value)
+        return Entity(
+            value=value,
+            entity=entity,
+            confidence=confidence,
+            type=type,
+            start_offset=index,
+            end_offset=index + len(value)
+        )
+
 
 @dataclass
 class Slot:
@@ -85,8 +97,9 @@ class SlotField:
 
 
 @dataclass
-class Message:
+class DialogueState:
     intent: Intent                      # 一个文本中只允许有一个意图
+    intents: List[Intent]
     slots: List[Slot]              # 抽取出的实体数据
     text: str
     datetime: datetime = datetime.now() # 默认当前时间
@@ -115,13 +128,13 @@ class Message:
         )
         slot = Slot(
             name=slot_name,
-            entity=entity
+            entity=entitjy
         )
         self.slots.append(slot)
 
     @staticmethod
-    def default(text: str) -> Message:
-        return Message(
+    def default(text: str) -> DialogueState:
+        return DialogueState(
             intent=Intent.default(),
             slots=[],
             text=text
@@ -135,12 +148,12 @@ class Corpus:
     entities: List[Entity]
 
 
-class DialogueState:
+class HistoryDialogueState:
     def __init__(self):
         self.slots: Dict[str, Slot] = {}
-        self.history_messages: List[Message] = []
+        self.history_messages: List[DialogueState] = []
 
-    def update(self, message: Message):
+    def update(self, message: DialogueState):
         for slot in message.slots:
             self.slots[slot.name] = slot
 
@@ -149,7 +162,7 @@ class DialogueState:
     def get(self, slot_name: str) -> Optional[Slot]:
         return self.slots.get(slot_name, None)
     
-    def latest_message(self) -> Optional[Message]:
+    def latest_message(self) -> Optional[DialogueState]:
         if not self.history_messages:
             return None
         return self.history_messages[-1]

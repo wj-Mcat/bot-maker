@@ -1,0 +1,2 @@
+[tool.pytest.ini_optionst]
+asyncio_mode="strict"

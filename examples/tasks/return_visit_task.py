@@ -1,5 +1,5 @@
 from bot_maker.maker import Task
-from bot_maker.schema import Message
+from bot_maker.schema import DialogueState
 
 class ReturnVisitTask(Task):
 
@@ -12,7 +12,7 @@ class ReturnVisitTask(Task):
         # 1. 具体位置共享
         while True:
             await self.bot.say('请问您这段时间有外出或位置具体变动吗？')
-            message: Message = await self.wait_for_user()
+            message: DialogueState = await self.wait_for_user()
             if message.intent.intent == 'deny':
                 return
             if message.intent.intent == 'confirm':

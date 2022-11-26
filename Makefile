@@ -87,9 +87,7 @@ pytest:
 test-unit: pytest
 
 .PHONY: test
-test:
-	echo 'fake test at this time ...'
-#test: check-python-version lint pytest
+test: pytest
 
 .PHONY: check-python-version
 check-python-version:
